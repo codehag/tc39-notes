@@ -1,5 +1,6 @@
 # November 2018 - Table of Contents
 
+- [Summary](2018-11_summary.html)
 - [November 27, 2018 Meeting Notes](nov-27.md#november-27-2018-meeting-notes)
   * [Agenda](nov-27.md#agenda)
   * [1. Welcome](nov-27.md#1-welcome)
