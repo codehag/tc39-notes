@@ -19,7 +19,7 @@ Ron Buckton (RBN), Bradley Farias (BFS), Robert Pamely (RPY), Leo Balter (LBR), 
 - [issue](https://github.com/tc39/ecma262/issues/1354)
 
 
-[Value:Integrity]
+[Value:New_Capability Tension:Integrity]
 SYG: Want to recap that there is a memory model bug. The good news is the spec is wrong. Evaluation results in candidate executions: set of events. CAndidate executions are constrained by the memory model. If your program doesn't have any data races, it should be sequentially be consistent. Data race free programs are sequentially consistent (DRF-SC). The relations in the memory model are listed
 Agent order
 Synchronizes with
@@ -146,7 +146,7 @@ SYG: People who want to email me, can read it unless you are a reviewer.
 
 WH: In addition to the strong and weak solutions, there was an intermediate solution on GitHub, correct? What are CWS's thoughts about it?
 
-[Value:Integrity Tension:MaxMin Resolution:MakeMaxMin]
+[Value:Integrity Tension:MaxMin Resolution:MaxMin]
 CWS: Thoughts on intermediate... I strongly disapprove of the strong fix because of the problems it causes. Intermediate fix is unclear; its one advantage is that it the makes the memory model smaller, but that's not necessarily something we should be optimizing. I want to give a little proof that the intermediate the solution doesn't have issues.
 
 WH: Are we convinced the weak solution will fix the problems?
@@ -175,7 +175,7 @@ SYG: That seems totally fine -- adding APIs to atomics that give you stronger gu
 
 (Bradley Farias)
 
-[Value:Interop]
+[Value:Expressiveness Support:Interop]
 BFS: We altered the text lightly instead of having it being phrased. We moved it to be part the tokenization and lexical grammar. Basically at the start of module or script is that Hashbang Comment and other types of comments are discarded from the stream of the outputs. No tests but seeking Stage 3 for this. Any comments or concerns?
 
 KG: Who were the reviewers?
@@ -209,20 +209,21 @@ BFS: Sounds good.
 
 DE: We realized decorators were still missing something and why it's important for v1... wanted to hear concerns for stage 3.
 
-[Value:Expressiveness]
+[Value:New_Capability Tension:?]
 DE: New feature: Some people were mentioning a debate matches what we had at the time. We had arguments on both sides. No real new arguments. It's split among the community and it was split among the community. One thing we can do is make decorators make the choice of set vs defined. (@set)
 
 DE: You might not want to use this when you are using a backing store i.e. in MobX.
 
-[Value:Expressiveness Tension:JITCompilation]
+[Value:New_Capability Tension:JIT_Compilation]
 DE: previous solution in decorators which didn't come up before in TC39 which is use a throwaway field, run the side-effect... I don't want to encourage this idiom. Unclear how JITs should reliably detect dead fields. This would encourage anti-patterns. This wasn't an issue in stage 0 because they were not about thinking the initializer.
 
-[Value:Expressiveness Tension:JITCompilation PResolution:NewCapability]
 DE: Instead, we could run a side effect outside of the decorator. Semantics decorators output can refrain from defining a field. We heard from the discussion of set and mobx that once the stage 2 was in babel, many people ran into this issue and proposed the mitigation and realized the flaws.
 
+[Value:Expressiveness Support:New_Capability]
+[Value:Expressiveness Support:Idiomatic_Patterns]
 DE: Decoratator descriptor can have a `kind`: `"initializer"`. See semantics slide. Any thoughts on the initializer feature? PR in babel and wanted feedback from the committee. Thank you to everyone who participated in threads and reviews for this.
 
-[Value:NewCapability Tension:Coherence]
+[Value:Expressiveness Tension:Coherence]
 RBN: Mentioned in issue thread I have concerns that using the initializer in initializer description somewhat conflates it. It feels like we should have a different if you're not initializing a value.
 
 DE: I misunderstood your review on the issue thread. What should the name be?
@@ -271,11 +272,11 @@ RBN: I am in favor of doing it right vs pushing it out.
 
 DE: Let's discuss online.
 
-[Value:Expressiveness Tension:FutureCompat]
-[Value:Expressiveness Tension:LeastSurprise]
+[Value:Expressiveness Tension:Future_Compat]
+[Value:Expressiveness Tension:Least_Surprise]
 MF: In private conversations with other members where decorators have really allowed advancement I have heard concerns that even though decorators are very popular, the general fit in the language and how it might affect the design of the language. Want to give the opportunity that is how they feel. I am not a fan decorators but I don't think it's harmful to the language. Community members who are in support of it, it seems there are groups who have taken advantage of the usage of it.
 
-[Value:Expressiveness Supports:Scaleability]
+[Value:Expressiveness Support:Scalability]
 DE: Doesn't really correspond with my discussion with framework authors. It seems most of the framework authors are saying classes don't work well without decorators. That seems to be a broad opinion but can't say much. Would love to hear more and maybe even proposals for stage 2 earlier? Given where we are, want to hear about this.
 
 MF: Yeah it seems people were agreeing for it but want to give opportunity. Since this is going to stage 3, it should be discussed.
@@ -300,12 +301,12 @@ MF: There could be a case where more people than not the feature should be inclu
 
 DE: I don't think that's the feeling about decorators right now. This is a strong feature and my feeling is that the committee has been persuaded for decorators but want to hear more.
 
-[Value:Expressiveness Tension:ComplexityBudget]
+[Value:Expressiveness Tension:Complexity_Budget]
 CM: Wanted to add some thoughts, I share MF's sense that the bunch of complexity to the language and I have a bias and I wouldn't bother this normally but as a committee member I feel everyone has had a chance to weigh in on it, we should be going ahead with it.
 
 EFT: As one of the resident grease monkeys about this I want to hear more from implementers about the complexity and optimizability of this.... Nothing?
 
-[Value:Expressiveness Tension:ResourceUsage]
+[Value:Expressiveness Tension:Resource_Usage]
 SGN: Decorators are not going to do a lot of harm for the runtime performance but startup performance. I'm trying to understand because committee members care about startup performance but this killing that...
 
 DE: What is the baseline for this? To be concrete the performance overhead is that decorates allow you observe this thunk before the JIT kicks in. The other overhead is you can't see what is a private method vs field and that becomes more complex to do.
@@ -333,15 +334,15 @@ KS: It's clear people want to use it but you also have to ask if we had a simila
 
 DE: I have arguments why decorators > JSX.
 
-[Value:Expressiveness PResolution:Userland]
+[Value:Ecosystem_Implementation Support:Expressiveness]
 JRL: One option we have is to leave it for babel and typescript. This can just become a syntax reservation for compilers to work on. If you shipped a decorator to a browser, it would throw because there's no runtime meaning to the decorator.
 
-[PResolution:Userland Tension:Interop]
+[Value:Ecosystem_Implementation Tension:Interop]
 DE: I originally proposed that and we wanted to promote the unification so that we had interoperable code.
 
 Diego: Yeah we talked about everyone would implement their own thing and we would have lots of interoperability.
 
-[Value:Expressiveness Tension:ResourceUsage]
+[Value:Expressiveness Tension:Resource_Usage]
 TST:  I don't see the value of startup costs if the feature is valuable enough that it will lead to dynamic code that will lead to performance benefit.
 
 SGN: Is that really the baseline then? Comparing against dynamic frameworks? Okay then let's ship this.
@@ -375,7 +376,7 @@ DE: I share MM's interest. I'm presenting on it now.
 - Withdrawn
 
 
-[Discussion:Distinguishing Templates]
+[Discussion:Distinguishing_Templates]
 ## Distinguishing templates: PR Phase 1, Spec Phase 2
 
 (Daniel Ehrenberg)
@@ -393,7 +394,7 @@ Host hook
 JavaScript API
 
 [Value:Integrity Tension:Interop]
-[Value:Integrity Tension:AdoptionPath]
+[Value:Integrity Tension:Adoption_Path]
 DE: Is this a good approach? If useful for embedders, should we brand template objects to let embedders know they are template objects? Would we consider a javascript API for this? I split them in 2 separate phases because there are some concerns with integrity checks. If we want that, we don't want a monkey patch to spoof it. All functions are properties of objects but lots of things going down the pipeline i.e. proposal from apple to make built in modules or get originals web platform proposals. When we are familiar with more than one, we will know which direction to go.
 
 WH: What are you trying to protect?
@@ -415,7 +416,7 @@ JH: It sounds like you are trying to verify if a tag is from source code. Since 
 
 DE: There are further properties that would be nice but this matches the original request and isn't that bad.
 
-[Value:Integrity Resolution:NewCapability]
+[Value:Integrity Resolution:New_Capability]
 [Value:Integrity Resolution:Expressiveness]
 KG: You mentioned JavaScript API which I think would be nice. API only useful if it's unforgeable... there are 3 things are not virtualizable -- Nan, undefined, infinity. Would the idea be introduce an unforgeable function?
 
@@ -548,7 +549,7 @@ KG: Let's take it offline.
 - [proposal](https://github.com/tc39/proposal-ECMA-402-datetime-style)
 
 [Value:Interop]
-[Value:NewCapability]
+[Value:New_Capability]
 DE: These are internationalization features and I'm just helping propose to stage 2. DateTimeFormat is currently locale-dependent style. dateStyle and timeStyle give you a more fine grained control and let you special narrow/short/medium/full. You can specify date, time or both
 
 ```
@@ -567,7 +568,7 @@ DE: It is not clear how to expose OS preferences. We've talked about browser pre
 
 MF: Is that a good thing?
 
-[Value:Interop Tension:StandardResponsibility]
+[Value:Interop Tension:Standard_Responsibility]
 DE: We are working little by little. We talk about the user-agent could provide this navigator.locales array of intl locale objects and maybe those locales could provide preferences but that leads to questions... i.e. its not clear we should keep growing existing extension mechanisms. I don't think this is the body to make that decision and ECMA 402 is been helping more with this. There isn't a clear way to make date/timeStyle. Also operating systems differ in their schemas.
 
 MF: I want to make sure whatever format we do accept would be possible to provide via user agent.
@@ -586,7 +587,7 @@ FTG: if there already a way for OS to give preference, it can set it. If OS has 
 
 DE: Something that is still an issue is . That slide shouldn't have a dot.
 
-[Value:NewCapability Tension:UserPref]
+[Value:New_Capability Tension:?]
 MF: I want a flexibility API to allow UA to pass the locale.
 
 DE: That is an open-ended feature request.
@@ -712,10 +713,10 @@ JHD: That seems reasonable to me.
 [Value:Expressiveness Tension:Consistency]
 DE: We have heard this consistency argument... how do we weigh that against what the community has to say. Dave did lot's of outreach about this issue. Majority prefers `a?.` on GitHub, additionally framework maintainers voiced similar opinions. I think there are a multiple ways we can think about consistency. It's a hard pill to swallow but consistency with other programming languages -- lots of languages use '?.' Even among frameworks, i.e. Angular HandleBars... I don't think these arguments favor one or the other but there are tradeoffs. How should the committee weigh these?
 
-[Value:Consistency Tension:ComplexityBudget]
+[Value:Consistency Tension:Complexity_Budget]
 WH: This proposal is mostly syntax driven — generated by the grammar for member expressions and call expressions. Those allow function calls already so we have to decide what to do with them regardless. The proposal as it is now (without the pending pull request) allows `?.` to apply to function calls the same way to square brackets. If we want to do steps to prevent that, we would be increasing the complexity of this proposal.
 
-[Value:Consistency Tension:MentalModel]
+[Value:Consistency Tension:Mental_Model]
 MM: the way people informally process text as opposed to the view from parsing—I can image even with the `?.[` property name being inconsistent with `?.` (where the consistent one would be `?..`). If you take a look at natural language, my sense is `?.` will come to mean optional chaining. I think ||| accepting null & undefined as falsey is bad. If we think of it as stricter || which is about truthiness and falsiness, I would expect ||| to be stricter, ie. is is just about true and false. If we use ?. for null chaining and ?? for null coalescing, then there is a suggestiveness that the ? is about null/undefined as opposed to ||| being about truthiness. I think the former is more consistent & better.
 
 DS: Thanks for the discussion. Anyone have additional concerns, please discuss.
@@ -739,6 +740,7 @@ RJE: Aki will tell us how the voting process will work but if there is anything 
 - Email Yulia your vote by tomorrow 12 PM
 
 
+[Discussion:Asset References]
 ## Asset References for Stage 1
 
 (Sebastian Markbage)
@@ -746,8 +748,7 @@ RJE: Aki will tell us how the voting process will work but if there is anything 
 - [proposal](https://github.com/sebmarkbage/ecmascript-asset-references)
 
 
-[Value:NewCapability]
-[Value:Tooling]
+[Value:Cowpath Support:New_Capability]
 SM: Goals of this is indirect dynamic import of relative path. Cross platform script authoring experience for assets... various bundlers can benefit from this.
 
 SM: To refresh our memory on dynamic imports. The current stage 3 proposal which lets us load a different module on demand. However loading things over the network can get complicated such as showing a dialog on retry, etc. The loading experience makes it complicated.
@@ -785,8 +786,7 @@ SM: The third one there is a theoretical loader API where we could do something 
 
 SM: Another use case is, where you have all kinds of resources, like images. There have been various ways to refer to images by relative paths. (Shows slide with prior art: Node.js, Webpack, Rollup, React Native, NativeScript, Web.)  But there's no canonical way to do this in JavaScript.
 
-[Value:Tooling]
-[Value:Cowpath]
+[Value:? Tension:?]
 SM: Solution today? There is no canonical way but instead we use transpilers to translate. So a common thing is to use webpack to resolve dependency graph and then take the webpack bundle and run it. The problem is you can't use the language itself.
 
 SM: So there are various ways we could approach this. We could build a whole ecosystem. But the smallest possible thing is that we need to get past this syntactical problem. We don't need runtime APIs, with polyfills, feature detection, etc. We just need the individual source files to be defined in a cross-platform way. The limitation today is there's no syntactic way to describe that.
@@ -827,12 +827,12 @@ MM: This would change the semantics of the dynamic import special form correct?
 
 SM: Yes. So, one example is import.meta that contains this reified information.
 
-[Value:NewCapability Tension:?]
+[Value:New_Capability Tension:?]
 SM: So the problem with this mechanism is that it allows you to use this mechanism in the runtime form. I can extract the URL from that and do my own resolution. With some mechanism in this library. Which is fine except that it doesn't have the static properties for build tools to use.
 
 SM: Another alternative to having the syntax is to use the import.meta mechanism which is pretty much host environment can have whatever they want. I propose we had a resolveURL so that people can specify what loader they want. The problem is this only works on the web so we need to unify people on this extension and the particular usage of assets in the static form. But also the return value here in the request is very specific to the web. Maybe there will be a specific form that works for node as well. But it's a very heavy-weight object that it is hard to unify. But you could imagine that mechanism having opaque semantics. We could also leave this as-is and let bundlers modify using some pseudo-syntax and we keep cross-compiling between platforms. Or we could add a higher-level structure into the language.
 
-[Value:NewCapability Tension:ComplexityBudget]
+[Value:New_Capability Tension:Complexity_Budget]
 MM: I think that this is adding a lot of mechanisms to both syntax and semantics around one of the worst thought out and newest features of the language which is dynamic import and import.meta. Both of these were allowed to proceed with the assumption that the Realm API would provide hooks to repair the unsafety. That hasn't converged yet and we don't fully understand how those hooks will work. You are trying to serve both bundlers and direct execution semantics in the absence of a bundler. You are trying to preserve the semantics with the absence of bundler. I like that. I sympathize with the goals here. I think dynamic imports and import.meta are some of the biggest mistakes we made and I don't want to consider adding more complexity to those mechanism until we figure those out.
 
 SM: To your point, or to counter that point, the alternative is that there is going to be a process to add more things to import.meta if we don't do it in the web spec today, or bundlers will take advantage of import.meta because we open the door for host environments to add whatever they want. If we don't give a direction here, then clients will define their direction elsewhere.
@@ -851,7 +851,7 @@ SM: No.
 
 MM: Okay. In that case, I might not have an objection.
 
-[Value:NewCapability Tension:Coherence]
+[Value:New_Capability Tension:Coherence]
 CM: Yeah so ergonomic nit, `import asset` is confusing because it is not importing anything but instead declaring a reference relative to the current context. I would just argue for a different keyword other than import asset.
 
 [Value:Expressiveness Tension:BackwardsCompat]
@@ -871,7 +871,7 @@ SM: I should explain more. There's concern when you create URLs to create repres
 
 MM: I would certainly want to look into it more deeply.
 
-[Value:Expressiveness Tension:ComplexityBudget]
+[Value:Expressiveness Tension:Complexity_Budget]
 SM: Some issues... is this too much syntax? Is dynamic syntax enough? Some questions about resolution timing i.e. if there is a resolution timing it probably needs to be a promise... even just getting a canonicalized reference value needs to be a promise. Parameterized static syntax? I'm really just looking to see if we want to continue exploring this in TC39? To go to stage 1.
 
 RJE: Objections to this going to Stage 1?
@@ -893,6 +893,7 @@ AK: So I am relaying with dominic and he gave me a quick statement. I think this
 - Some thoughts to iron out before approval to stage 2 see proposal thread
 
 
+[Discussion:Regex]
 ## isRegExp change
 
 (Jordan Harband)

@@ -1,4 +1,4 @@
-:- module(dot_emitter, [dot_emitter/1]).
+:- module(dot_emitter, [dot_emitter/1, print_dot_discussion/1]).
 :- use_module(value_dict).
 
 get_color(support, "blue").
@@ -17,8 +17,8 @@ sub_emitter([?|Ins]) :-
 sub_emitter([In|Ins]) :-
   findall(X, lookup(In, X, tension(In, X)), Tensions),
   findall(X, lookup(In, X, support(In, X)), Supports),
-  print_subgraph(tension, In, Tensions, blue),
-  print_subgraph(support, In, Supports, red),
+  print_segment(tension, In, Tensions),
+  print_segment(support, In, Supports),
   sub_emitter(Ins).
 
 print_subgraph(_, _, [], _).
@@ -49,7 +49,15 @@ print_segment(Type, A, [L|Ls]) :-
   get_color(Type, Color),
   format(Color),
   format(";"),
-  format("stroke-width: 2px;\" arrowheadStyle=\"fill: #f77\"]"),
+  format("stroke-width: 2px;\" arrowheadStyle=\"fill: "),
+  format(Color),
+  format("\"]"),
   format("\n"),
   print_segment(Type, A, Ls).
+
+print_dot_discussion([]).
+print_dot_discussion([Interaction|Ins]) :-
+  [I, A, B] = Interaction,
+  print_segment(I, A, [B]),
+  print_dot_discussion(Ins).
 

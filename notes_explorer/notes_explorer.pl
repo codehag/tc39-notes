@@ -1,15 +1,10 @@
 :- use_module(library(clpfd)).
+:- use_module(load_note).
 :- use_module(value_dict).
 :- use_module(print_info).
 :- use_module(dot_emitter).
 :- use_module(json_emitter).
 :- use_module(pl_emitter).
-
-load_note(Argv) :-
-  string_concat(Argv, '.md', Input),
-  open(Input, read, Str),
-  read_file(Str),
-  close(Str).
 
 write_to_dot :-
   findall(X, value(X), Vals),
@@ -45,100 +40,23 @@ inspect_value(Value) :-
   print_info([Value]).
 
 inspect_discussion(DiscussionName) :-
-  findall(X, lookup(Value, X, discussion(X, DiscussionName)), Discussions),
+  findall(X, lookup(DiscussionName, X, discussion(DiscussionName, X)), Examples),
   format("Discussion:"),
   format("\n"),
   format(DiscussionName),
   format("\n"),
-  print_discussion(Discussions).
+  print_discussion(Examples).
 
-read_file(Stream) :-
-  \+ at_end_of_stream(Stream),
-  read_line_to_string(Stream,Tmp),
-  test_string(Stream, Tmp),
-  read_file(Stream).
+inspect_dot_discussion(DiscussionName) :-
+  findall(X, lookup(DiscussionName, X, discussion(DiscussionName, X)), Examples),
+  format("digraph {"),
+  format("\n"),
+  get_dot_discussion(Examples),
+  format("}").
 
-read_file(Stream) :-
-  at_end_of_stream(Stream).
 
-test_string(Stream, String) :-
-  \+ skip_line(String),
-  parse_line(String, Group),
-  next_line(Stream, Group2, Example),
-  append(Group, Group2, Groups),
-  build_relationship(Groups, _, Example).
-
-test_string(Stream, String) :-
-  is_discussion(String),
-  set_c_discussion(Stream).
-
-test_string(_, String) :-
-  skip_line(String).
-
-is_discussion(String) :-
-  String = "[Discussion]".
-
-set_c_discussion(Stream) :-
-  at_end_of_stream(Stream).
-
-set_c_discussion(Stream) :-
-  \+ at_end_of_stream(Stream),
-  read_line_to_string(Stream, String),
-  set_current_discussion(String).
-
-skip_line(String) :-
-  not(sub_string(String, 0, 7, _, _)).
-
-skip_line("").
-skip_line(String) :-
-  sub_string(String, 0, 7, _, TestString),
-  not(TestString = "[Value:").
-
-parse_line(String, Groups) :-
-  string_length(String, Length),
-  Newlength is Length - 2,
-  sub_string(String, 1, Newlength, _, SubString),
-  split_string(SubString, " ", "", Groups).
-
-next_line(Stream, Values, Out) :-
-  \+ at_end_of_stream(Stream),
-  read_line_to_string(Stream, String),
-  check_line(Stream, String, Values, Out).
-
-check_line(Stream, String, Values, Out) :-
-  \+ skip_line(String),
-  parse_line(String, Value),
-  next_line(Stream, NextValues, Out),
-  append(Value, NextValues, Values).
-
-check_line(_, String, [], String) :-
-  skip_line(String).
-
-build_relationship([], _, _).
-build_relationship([Group|Groups], _, Example) :-
-  split_string(Group, ":", "", [Key,V]),
-  Key = "Value",
-  atom_string(AtomValue, V),
-  downcase_atom(AtomValue, Value),
-  value_lookup(Value),
-  set_example(value, Value, Example),
-  build_relationship(Groups, Value, Example).
-
-build_relationship([Group|Groups], Ref, Example) :-
-  split_string(Group, ":", "", [Key,V]),
-  Key = "Tension",
-  atom_string(AtomValue, V),
-  downcase_atom(AtomValue, Value),
-  lookup(Ref, Value, tension(Ref,Value)),
-  set_example(tension, Ref, Value, Example),
-  build_relationship(Groups, Ref, Example).
-
-build_relationship([Group|Groups], Ref, Example) :-
-  split_string(Group, ":", "", [Key,V]),
-  Key = "Support",
-  atom_string(AtomValue, V),
-  downcase_atom(AtomValue, Value),
-  lookup(Ref, Value, support(Ref, Value)),
-  set_example(support, Ref, Value, Example),
-  build_relationship(Groups, Ref, Example).
-
+get_dot_discussion([]).
+get_dot_discussion([In|Ins]) :-
+  findall([B, A, L], get_example(B, A, L, In), Out),
+  print_dot_discussion(Out),
+  get_dot_discussion(Ins).

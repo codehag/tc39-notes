@@ -1,4 +1,4 @@
-:- module(value_dict, [value/1, description/2, support/2, discussion/2, example/3, example/4, lookup/3, value_lookup/1, set_example/4, get_example/4, set_example/3, get_example/3, set_current_discussion/1]).
+:- module(value_dict, [value/1, description/2, support/2, discussion/2, example/3, example/4, lookup/3, value_lookup/1, set_example/4, get_example/4, set_example/3, get_example/3, set_current_discussion/1, set_discussion_keyword/2]).
 :- dynamic tension/2.
 :- dynamic support/2.
 :- dynamic value/1.
@@ -7,6 +7,7 @@
 :- dynamic example/4.
 :- dynamic discussion/2.
 :- dynamic current_discussion/1.
+:- dynamic discussion_keyword/2.
 
 tension(?, ?).
 value(?).
@@ -15,6 +16,7 @@ example(?, ?, ?, ?).
 example(?, ?, ?).
 discussion(?, ?).
 current_discussion(?).
+discussion_keyword(?, ?).
 
 lookup(_, _, Goal) :-
   Goal.
@@ -32,6 +34,12 @@ set_discussion(Example) :-
   current_discussion(A),
   assert(discussion(A, Example)).
 
+set_discussion_keyword(Keyword, Discussion) :-
+  discussion_keyword(Keyword, Discussion).
+set_discussion_keyword(Keyword, Discussion) :-
+  not(discussion_keyword(Keyword, Discussion)),
+  assert(discussion_keyword(Keyword, Discussion)).
+
 set_example(Type, A, B, E) :-
   example(Type, A, B, E).
 set_example(Type, A, B, E) :-
@@ -42,7 +50,6 @@ set_example(Type, A, E) :-
   example(Type, A, E).
 set_example(Type, A, E) :-
   not(example(Type, A, E)),
-  set_discussion(E),
   assert(example(Type, A, E)).
 
 get_example(Type, A, B, E) :-

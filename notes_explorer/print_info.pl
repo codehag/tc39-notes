@@ -1,4 +1,4 @@
-:- module(print_info, [print_info/1, print_segment/4]).
+:- module(print_info, [print_info/1, print_segment/4, print_discussion/1]).
 :- use_module(value_dict).
 
 print_info([]).
@@ -57,14 +57,25 @@ print_examples([In|Ins]) :-
 
 print_discussion([]).
 print_discussion([In|Ins]) :-
-  format("Example:"),
-  format("\n"),
+  format("Text: "),
   format(In),
+  format("\n"),
   format("\n"),
   format("All Interactions:"),
   findall([B, A, L], get_example(B, A, L, In), Out),
   format("\n"),
-  print(Out),
+  print_interaction(Out),
   format("\n"),
-  print_examples(Ins).
+  format("\n"),
+  print_discussion(Ins).
+
+print_interaction([]).
+print_interaction([Interaction|Ins]) :-
+  [I, A, B] = Interaction,
+  format(I),
+  format(": "),
+  format(A),
+  format("->"),
+  format(B),
+  print_interaction(Ins).
 

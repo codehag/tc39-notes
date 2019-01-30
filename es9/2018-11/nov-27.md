@@ -213,6 +213,7 @@ YSV: Because meetings run quite long, in order to avoid conflicts, we'll rotate 
 - Chair group adopted with unanimous consent
 
 
+[Discussion:Layering]
 ## Modules layering/naming for WebAssembly
 
 (Daniel Ehrenberg)
@@ -234,7 +235,7 @@ BT: It's sort-of normative-ish. It's hard to pull the pieces apart. So it was be
 
 JHD: This is a layering change that makes it easier for implementers.
 
-[Tension:Interop Value:Interop Resolution:Discussion]
+[Value:Interop Tension:Interop Resolution:Discussion]
 BT: Not on the language, but it could have impact on embedders.
 
 DE: Where were concerns raised?
@@ -247,11 +248,13 @@ Rex: Any objections?  Looks like we're okay.
 
 - PR Approved
 
+[Discussion:Modules]
 ## A name change from "Module.Instantiate" to "Module.Link".
 
 https://github.com/tc39/ecma262/pull/1312
 
-[Value:Interop Tension:Coherence Resolution:Renaming]
+[Value:Interop Tension:Coherence]
+[Value:Expressiveness Support:Coherence]
 DE: The motivation is that, from WebAssembly perspective, we have a separate phase called instantiate, which happens in the instantiation phase of the JS module pipeline. Link is a better, more clear name. Some identifiers within programs might want to be renamed.
 
 DH: I think the linking terminology is good. My question is, is this the phase where the function that actually gets instantiated?  Because where functions get turned into dynamic values is early in the process—is that where this is?  Because that's why it was called instantiation, but if conceptually this is the phase where dependencies get wired up, then link is a good name.
@@ -260,6 +263,7 @@ DH: I think the linking terminology is good. My question is, is this the phase w
 
 - OK to merge the PR.
 
+[Discussion:Modules]
 ## Dynamic modules layering change
 
 (Guy Bedford)
@@ -269,12 +273,11 @@ DH: I think the linking terminology is good. My question is, is this the phase w
 
 GB: This is something we need in Node.js. It's been discussed quite a bit. I'll do a quick recap. In node, the idea is to support commonjs modules is to import directly. Eg, `import { name } from "cjs"`. The problem is that named exports of a commonjs module, you have to execute it. It's not static. We can execute the cjs modules during the instantiate phase, but this causes problems. If you have execution errors in commonjs, you can't guarantee statements execute in order. This is not intuitive behavior.
 
-[Value:Interop]
+[Value:New_Capability Support:Interop]
 Our solution is the Dynamic Modules proposal. If you've got an es modules importing a name from a cjs module, we're going to create a placeholder binding. When the cjs executes, we'll populate the placeholder binding. There's one major problem. If you have a circular reference between two EcmaScript modules, it's possible to access the namespace before the module is finished loading.
 
 The first approach to fix the above problem was to ban cycles with namespaces referencing dynamic modules. The new approach is to mark it as a "pending dynamic namespace".
 
-[Value:Interop Tension:Coherence Resolution:NewCapability]
 Dynamic namespaces current approach
 Mark it as pending dynamic name space
 ...
@@ -343,7 +346,7 @@ JHD: That is the case in ES6 already.
 
 YK: Basically what I'm worried about is, if you import something... I'd rather talk about this in a breakout session.
 
-[Value:Interop Tension:LeastSurprise]
+[Value:Interop Tension:Least_Surprise]
 [Value:Interop Tension:Coherence]
 DH: I get more errors unless I use star form, but that's a bad outcome. We shouldn't be encouraging the star form over the binding form.
 
@@ -353,7 +356,7 @@ DH: That doesn't matter because what browsers do for transpilers, people will fo
 
 GB: The behavior, in terms of error behavior, remains exactly the same. If you import a name tht doesn't exist, that error will be caught during the initialization phase, but in a function (?) it gets caught during execution phase. I will stress that Node.js needs to be able to move forward with ES6 modules soon. It is important that we are able to move forward not being blocked by TC39. We don't want to implement this if TC39 doesn't see this as being 262-compatible.
 
-[Value:NewCapability Tension:FutureCompat]
+[Value:New_Capability Tension:Future_Compat]
 WH: Just so that we're on the same page, I'm interested in DH's example, and implications of it. If I understand correctly, if you import a name directly and the name doesn't exist, you get an error right away. If you import star, you don't get an error until you reference it later. Then you can write code that is compatible with different versions of the library. Would the ecosystem evolve with these different types of behavior?
 
 YK: I think it's the same question: Does this mean that you can observe the namespace having nothing to having something. Is that new?
@@ -502,6 +505,7 @@ BT: TODO: Editor hats for the editors.
 - We will reconvene tomorrow after break (2:15 PM)
 
 
+[Discussion:Stable Sort]
 ## Stable sort for Array.prototype.sort
 
 (Mathias Bynens)
@@ -510,7 +514,7 @@ BT: TODO: Editor hats for the editors.
 - [proposal](https://github.com/tc39/ecma262/pull/1340)
 
 
-[Value:Coherence Resolution:MakeCoherent]
+[Value:Consistency Support:Consistency]
 MB: ChakraCore merged a stable merge sort. Moddable added a stable sort as well. Chrome 69 stable sorting is all green on the sort stability page.
 
 MB: Array.prototype.sort is stable in all major browsers and in Moddable/XS!
@@ -524,6 +528,7 @@ MB: Hoping to get consensus to make sort stable in Array.prototype.sort. See PR#
 - Approved for merge
 
 
+[Discussion:Override Mistake]
 ## Override mistake fix status update
 
 (Daniel Ehrenberg)
@@ -534,7 +539,7 @@ DE: (describes the PR above)
 
 NSH: In the past, that has happened for me because a library included that feature.
 
-[Value:BackwardsCompat Resolution:MakeCompat]
+[Value:Consistency Tension:Backwards_Compat]
 MM: A little bit of history. An example each way. In ES5, with a global JSON object, it broke Facebook. Because the stuff that was broken was served by Facebook, they could simply fix it and the problem went away. ES5 also broke an old version of jQuery, not the current version. But that was a problem because jquery code is distributed by being copied, not served. So we (tc39) had to fix it, but only in the least painful way that enabled that old version of jquery to not break. So the particulars of what is causing the breakage matters.
 
 #### Conclusion/Resolution
@@ -619,13 +624,14 @@ DE: Yeah.
 
 DE: Shout out to Justin for taking notes at outreach meetings :)
 
+[Discussion:Symbol description]
 ## Symbol.description for Stage 4
 
 (Michael Ficarra)
 
 - [proposal](https://github.com/tc39/proposal-Symbol-description)
 
-[Value:NewCapability]
+[Value:Expressiveness Support:New_Capability]
 MF: Symbol description stage 3 right now. Internal description slot is filled in via the constructor of Symbol. That's it. We have implementation support on 3 major browsers: V8, Spider monkey, ChakraCore. Any objections?
 
 #### Conclusion/Resolution
@@ -633,6 +639,7 @@ MF: Symbol description stage 3 right now. Internal description slot is filled in
 - Stage 4 acceptance
 
 
+[Discussion:Function toString]
 ## Function.prototype.toString revision for Stage 4
 
 (Michael Ficarra)
@@ -713,9 +720,8 @@ MF: I think DD might have something to say about that. I think he's saying that 
 
 DE: So the compatibility issue.. I find it hard to see how that issue would arise in practice.
 
-[Value:ResourceUsage Tension:FutureCompat]
-[Value:Interop Tension:FutureCompat]
-[ValueDesc: toString is an expensive operation that could be optimized out]
+[Value:Resource_Usage Tension:Future_Compat]
+[Value:Interop Tension:Future_Compat]
 SM: I'm not concerned about web compatibility issues. I'm concerned about future things like moddables being compatible with existing code.
 
 DE: I think there are a lot of decisions that could make it more or less compatible from web code. If someone is expecting the source code, they can make a mode to get it.
@@ -736,7 +742,7 @@ JH: I think in the current spec in the crossed out lines... if the implementatio
 
 SM: I think there's a pretty strong argument that bound functions have been an exact string for a long time that this issue would have happened in the ecosystem anyway that it's not going to be a concern.
 
-[Value:Interop Tension:FutureCompat]
+[Value:Interop Tension:Future_Compat]
 WH: I am a bit concerned what happens when the user starts using the functionality of this thing to determine native or not. The whole point of this proposal to reduce the divergence in implementations. Let me give an example: currently a built in function must not show the source code. How would you polyfill that?
 
 MF: Replace Function.prototype.toString
@@ -779,6 +785,7 @@ MF: So... any objections to stage 4?
 - Stage 4 acceptance
 
 
+[Discussion:NumberFormat]
 ## Intl.NumberFormat Feature Proposal for Stage 3
 
 Shane Carr (SCR)
@@ -787,7 +794,7 @@ Shane Carr (SCR)
 
 SCR: This is an update proposal I showed in July to stage 2 and now we want to go to stage 3. Most of the slides are the same but wanted to give it again for newcomers.
 
-[Value:NewCap]
+[Value:Expressiveness Support:New_Capability]
 SCR: Motivation for this format is to add more number formatting features to ECMA-402. Feature and important to Google because locale data footprint and barrier to entry. Adding features as opposed to
 
 SCR: 4 sections: Spec clean up
