@@ -35,7 +35,7 @@ def exec_swipl(code):
             textlist.append(line)
             if 'GRAPHVIZ' in line:
                 textlist.pop() # get rid of start marker
-                textlist.append("print('hello').")
+                textlist.append("?- print('hello').")
             if 'QUERYSTART' in line:
                 textlist.pop() # get rid of start marker
                 textlist.append(startQuery)
