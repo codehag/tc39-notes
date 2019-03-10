@@ -18,7 +18,7 @@ discussion(?, ?).
 current_discussion(?).
 discussion_keyword(?, ?).
 
-lookup(_, _, Goal) :-
+lookup(A, B, Goal) :-
   Goal.
 lookup(Key, _, Goal) :-
   not(Goal),
