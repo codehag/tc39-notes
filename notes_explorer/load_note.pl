@@ -7,14 +7,13 @@ load_note(Argv) :-
   read_file(Str),
   close(Str).
 
+read_file(end_of_file).
+
 read_file(Stream) :-
   \+ at_end_of_stream(Stream),
   read_line_to_string(Stream,Tmp),
   test_string(Stream, Tmp),
   read_file(Stream).
-
-read_file(Stream) :-
-  at_end_of_stream(Stream).
 
 test_string(Stream, String) :-
   \+ skip_line(String),
@@ -34,8 +33,7 @@ is_discussion(String) :-
   sub_string(String, 0, 11, _, TestString),
   TestString = "[Discussion".
 
-set_c_discussion(Stream, _) :-
-  at_end_of_stream(Stream).
+set_c_discussion(end_of_file, _).
 
 set_c_discussion(Stream, String) :-
   \+ at_end_of_stream(Stream),

@@ -1,96 +1,72 @@
 import os
 import os.path as op
-import tempfile
 import IPython
+from IPython.display import IFrame, Image, display
+from IPython.core.display import HTML
 import jupyter_client
-from IPython.utils.process import getoutput
 from backports import tempfile
+from graphviz import Source
 
 def exec_swipl(code):
-    temp_path, output_path, code_path = setup_env()
-    #dirpath = '/opt/conda/share/jupyter/kernels/swi/temp'  # tempfile.mkdtemp()
-    #preCode = 'do([]). do([V-G|R]) :-  findall(V, (  (call(G)->write(\'True: \');write(\'False: \')) ,  write(G), nl), _), do(R).'
-    preCode1 = 'doa([]).\n\n'
-    preCode2 = 'doa( [G|_] ) :-  write(\' \\n----------------------------------------- \\n Call of: \\t \'), write(G), call(G), write(\' \\n TRUE with:\\t \'), write(G), fail.\n\n'
-    preCode3 = 'doa( [G|R] ) :- not(G), !, write(\' \\n FALSE!  \\t \'), write(G), doa(R).\n\n'
-    preCode4 = 'doa( [_|R] ) :- doa(R).\n\n'
-    emptyline = '\n'
-    startQuery = ':- doa(['
-    endQuery = ']).'
-    with open(temp_path, 'w') as f: #
+    temp_path, output_path, code_path, dirpath = setup_env()
+    with open(temp_path, 'w') as f:
         f.write(code)
-    ''' Parser code begins here '''
+
+    ''' Parser '''
     textlist = []
-    textlist.append(preCode1)
-    textlist.append(preCode2)
-    textlist.append(preCode3)
-    textlist.append(preCode4)
-    textlist.append(emptyline)
-    with open(temp_path) as f:
+    graphviz = False
+    with open(temp_path) as lines:
         '''
-        some hacky logic to enable students to simply add queries
-        after defining their ruleset.
+        Parse for graphviz input
         '''
-        for line in f:
+        for line in lines:
             textlist.append(line)
             if 'GRAPHVIZ' in line:
-                textlist.pop() # get rid of start marker
-                textlist.append("?- print('hello').")
-            if 'QUERYSTART' in line:
-                textlist.pop() # get rid of start marker
-                textlist.append(startQuery)
-            if 'QUERYEND' in line:
-                textlist.pop() # get rid of end marker
-                textlist.append(endQuery)
-    print(''.join(textlist))
+                textlist.pop()
+                textlist.append("?- print('GRAPHVIZ').")
+                graphviz = True # output is graphviz
     with open(code_path, 'w') as rules:
         rules.write(''.join(textlist))
-    tmp_dir = tempfile.mkdtemp()
-    code2_path = op.join(tmp_dir, 'code2.pl')
-    with open(code_path, 'w') as rules:
-         rules.write(''.join(textlist))
-    #with tempfile.TemporaryDirectory() as temp_dir
 
-    #rules_target_path
-    ''' Parser code begins here '''
+    ''' Get Prolog Output from code.pl and assign to output_path file '''
+    os.system("swipl {0:s} > {1:s}  2>&1 ".format(code_path, output_path))
 
-
-    os.system("swipl {0:s} > {1:s}  2>&1 ".format(code_path, output_path))  # source_path, program_path))
-    #out = os.system("swipl {0:s} ".format(source_path))  # source_path, program_path))
-    l = open(output_path, 'r')
-    lines = l.readlines()
-    l.close()
+    ''' Remove Prolog welcome text '''
+    base = open(output_path, 'r')
+    lines = base.readlines()
+    base.close()
     lines = lines[:-9]
 
-    t = open(output_path, 'w')
+    outputlist = []
     for line in lines:
-        t.write(line)
-    t.close()
-    #iwith open(output_path, 'w') as output:
-    #    output.write(lines)
+        outputlist.append(line)
+        if 'GRAPHVIZ' in line:
+            outputlist = []
+    with open(output_path, 'w') as rules:
+        rules.write(''.join(outputlist))
 
-    f = open(output_path, 'r')
+    ''' Return final output '''
+    final = open(output_path, 'r')
+    output = final.read()
 
-    return f.read()
+    #if graphviz == True:
+        #src = Source('digraph "the holy hand grenade" { rankdir=LR; 1 -> 2 -> 3 -> lob }')
+        #src.format = 'png'
+        #output = src.render('image.gv')
+    return output
 
 def setup_env():
-    #dirpath = '/opt/conda/share/jupyter/kernels/swi/temp'  # tempfile.mkdtemp()
     dirpath =  tempfile.mkdtemp()
 
     temp_path = op.join(dirpath, 'temp.pl')
     output_path = op.join(dirpath, 'out.txt')
     code_path = op.join(dirpath, 'code.pl')
-    return temp_path, output_path, code_path
-
-
-
+    return temp_path, output_path, code_path, dirpath
 
 """SWI-Prolog kernel wrapper"""
 from ipykernel.kernelbase import Kernel
 
 class SwiplKernel(Kernel):
-
-    # http://localhost:8890/notebooks/swipl_testing.ipynb#kernel information.
     implementation = 'SWI-Prolog'
     implementation_version = '0.0'
     language = 'Prolog'
@@ -105,10 +81,8 @@ class SwiplKernel(Kernel):
                    allow_stdin=False):
         """This function is called when a code cell is executed."""
         if not silent:
-            # We run the Prolog code and get the output.
             output = exec_swipl(code)
 
-            # We send back the result to the frontend.
             stream_content = {'name': 'stdout',
                               'text': output}
             self.send_response(self.iopub_socket,
