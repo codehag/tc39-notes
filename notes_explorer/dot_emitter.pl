@@ -24,7 +24,7 @@ sub_emitter([In|Ins]) :-
 print_subgraph(_, _, [], _).
 print_subgraph(Type, A, [?|Ls], Color) :-
   print_subgraph(Type, A, Ls, Color).
-print_subgraph(Type, A, Ls, Color) :-
+print_subgraph(Type, A, Ls, _) :-
   format("\n"),
   format("subgraph "),
   format(Type),
@@ -44,14 +44,6 @@ print_segment(Type, A, [L|Ls]) :-
   format(A),
   format("->"),
   format(L),
-  format(" "),
-  format("[style=\"stroke: "),
-  get_color(Type, Color),
-  format(Color),
-  format(";"),
-  format("stroke-width: 2px;\" arrowheadStyle=\"fill: "),
-  format(Color),
-  format("\"]"),
   format("\n"),
   print_segment(Type, A, Ls).
 

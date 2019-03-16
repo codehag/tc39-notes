@@ -43,7 +43,7 @@ print_info([In|Ins]) :-
   print_info(Ins).
 
 has_coma([]).
-has_coma(Ins) :-
+has_coma(_) :-
   format(","),
   format("\n").
 
@@ -97,9 +97,9 @@ print_examples([In|Ins]) :-
   format("\n"),
   print_examples(Ins).
 
-replace_substring(String, To_Replace, Replace_With, Result) :-
+replace_substring(String, To_Replace, _, Result) :-
     (    append([Front, To_Replace, Back], String)
-    ->   append([Front, Replace_With, Back], R),
-         replace_substring(Back, To_Replace, Replace_with, Result)
+    ->   append([Front, _, Back], _),
+         replace_substring(Back, To_Replace, _, Result)
     ;    Result = String
     ).

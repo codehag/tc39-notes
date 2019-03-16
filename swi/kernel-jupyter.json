@@ -1,0 +1,9 @@
+{
+"argv": ["python",
+         "/usr/local/share/jupyter/kernels/swipl/swipl_kernel.py",
+         "-f",
+         "{connection_file}"
+        ],
+"display_name": "SWI-Prolog-Jupyter"
+}
+

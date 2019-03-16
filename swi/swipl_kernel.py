@@ -21,9 +21,9 @@ def exec_swipl(code):
         '''
         for line in lines:
             textlist.append(line)
-            if 'GRAPHVIZ' in line:
+            if '%graphviz' in line:
                 textlist.pop()
-                textlist.append("?- print('GRAPHVIZ').")
+                textlist.append("?- print('GRAPHVIZ').\n")
                 graphviz = True # output is graphviz
     with open(code_path, 'w') as rules:
         rules.write(''.join(textlist))
@@ -37,6 +37,7 @@ def exec_swipl(code):
     base.close()
     lines = lines[:-9]
 
+
     outputlist = []
     for line in lines:
         outputlist.append(line)
@@ -49,10 +50,11 @@ def exec_swipl(code):
     final = open(output_path, 'r')
     output = final.read()
 
-    #if graphviz == True:
-        #src = Source('digraph "the holy hand grenade" { rankdir=LR; 1 -> 2 -> 3 -> lob }')
-        #src.format = 'png'
-        #output = src.render('image.gv')
+    if graphviz == True:
+        src = Source(output)
+        src.format = 'png'
+        print(output)
+        output = src.render('image.gv')
     return output
 
 def setup_env():
