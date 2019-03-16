@@ -15,7 +15,7 @@ RUN pip install graphviz && \
   pip install jswipl && \
   mkdir -p /opt/conda/share/jupyter/kernels/jswipl/
 
-RUN cd work && git clone --depth 1 https://github.com/codehag/tc39-notes
+RUN rm -r work && git clone --depth 1 https://github.com/codehag/tc39-notes
 
 COPY jswipl/kernel.json /opt/conda/share/jupyter/kernels/jswipl/
 # Security layer. Remove for building for deployment
