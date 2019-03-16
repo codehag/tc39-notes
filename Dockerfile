@@ -15,9 +15,12 @@ RUN pip install graphviz && \
   pip install jswipl && \
   mkdir -p /opt/conda/share/jupyter/kernels/jswipl/
 
-COPY jswipl/kernel.json /opt/conda/share/jupyter/kernels/jswipl/
-COPY .jupyter/jupyter_notebook_config.py ~/.jupyter/
-
 RUN cd work && git clone --depth 1 https://github.com/codehag/tc39-notes
+
+COPY jswipl/kernel.json /opt/conda/share/jupyter/kernels/jswipl/
+# Security layer. Remove for building for deployment
+# COPY .jupyter/jupyter_notebook_config.py .jupyter/
+# COPY .jupyter/mycert.pem /mycert.pem
+# COPY .jupyter/mykey.key /mykey.key
 
 CMD start-notebook.sh --port=$PORT
