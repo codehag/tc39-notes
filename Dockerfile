@@ -16,5 +16,8 @@ RUN pip install graphviz && \
   mkdir -p /opt/conda/share/jupyter/kernels/jswipl/
 
 COPY jswipl/kernel.json /opt/conda/share/jupyter/kernels/jswipl/
+COPY .jupyter/jupyter_notebook_config.py ~/.jupyter/
 
 RUN cd work && git clone --depth 1 https://github.com/codehag/tc39-notes
+
+CMD start-notebook.sh --port=$PORT
